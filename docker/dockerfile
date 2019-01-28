@@ -1,0 +1,48 @@
+FROM node:8-stretch  as builder
+
+# Java
+RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
+RUN apt-get update && apt-get -y install openjdk-8-jdk
+
+# Python
+RUN apt-get update \
+    && apt-get install -y python \ 
+    && apt-get clean && rm -rf /var/cache/apt/* && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/* 
+
+# Prepare project dirs and add a user account
+RUN adduser --disabled-password --gecos '' theia && \
+  adduser theia sudo && \
+  echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers;
+
+RUN chmod g+rw /home && \
+  mkdir -p /home/project && \
+  chown -R theia:theia /home/theia && \
+  chown -R theia:theia /home/project;
+
+# Build theia
+WORKDIR /home/theia
+ADD package.json ./package.json
+RUN yarn --cache-folder ./ycache && rm -rf ./ycache
+RUN yarn theia build
+
+FROM node:8-stretch
+WORKDIR /home/theia
+COPY --from=builder /home/theia .
+
+# Install python language server
+RUN apt-get update \
+    && apt-get install -y python3 python3-dev python3-pip \ 
+    && apt-get clean && rm -rf /var/cache/apt/* && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/*
+RUN rm /usr/bin/python && \
+    ln -s /usr/bin/python3 /usr/bin/python && \
+    ln -s /usr/bin/pip3 /usr/bin/pip
+RUN pip install \
+    python-language-server \
+    flake8 \
+    autopep8 \
+    futures \
+    configparser
+
+EXPOSE 3000
+ENV SHELL /bin/bash
+ENTRYPOINT [ "yarn", "theia", "start", "/home/project", "--hostname=0.0.0.0" ]
