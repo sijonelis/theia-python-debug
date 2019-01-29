@@ -2,7 +2,7 @@ FROM node:8-stretch  as builder
 
 # Java
 RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
-RUN apt-get update && apt-get -y install openjdk-8-jdk
+RUN apt-get update && apt-get -y install openjdk-8-jdk 
 
 # Python
 RUN apt-get update \
@@ -13,6 +13,9 @@ RUN apt-get update \
 RUN adduser --disabled-password --gecos '' theia && \
   adduser theia sudo && \
   echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers;
+
+# Install dependenciesto better compile C files
+RUN apt update && apt-get install -y build-essential libkrb5-dev 
 
 RUN chmod g+rw /home && \
   mkdir -p /home/project && \
