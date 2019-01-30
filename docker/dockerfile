@@ -1,8 +1,4 @@
-FROM node:8-stretch  as builder
-
-# Java
-RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
-RUN apt-get update && apt-get -y install openjdk-8-jdk 
+FROM node:8-stretch as builder
 
 # Python
 RUN apt-get update \
@@ -14,8 +10,9 @@ RUN adduser --disabled-password --gecos '' theia && \
   adduser theia sudo && \
   echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers;
 
-# Install dependenciesto better compile C files
-RUN apt update && apt-get install -y build-essential libkrb5-dev 
+#Theia
+##Needed for node-gyp, nsfw build
+RUN apt-get update && apt-get install -y python build-essential
 
 RUN chmod g+rw /home && \
   mkdir -p /home/project && \
@@ -23,6 +20,7 @@ RUN chmod g+rw /home && \
   chown -R theia:theia /home/project;
 
 # Build theia
+USER theia
 WORKDIR /home/theia
 ADD package.json ./package.json
 RUN yarn --cache-folder ./ycache && rm -rf ./ycache
@@ -30,7 +28,12 @@ RUN yarn theia build
 
 FROM node:8-stretch
 WORKDIR /home/theia
+
 COPY --from=builder /home/theia .
+
+# Install Java language server
+RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
+RUN apt-get update && apt-get -y install openjdk-8-jdk 
 
 # Install python language server
 RUN apt-get update \
