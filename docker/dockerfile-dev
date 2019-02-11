@@ -26,8 +26,10 @@ RUN adduser --disabled-password --gecos '' theia && \
 ##Needed for node-gyp, nsfw build
 RUN apt-get update && apt-get install -y python build-essential
 
-#install yeoman
-RUN npm install -g yo generator-theia-extension
+RUN chmod g+rw /home && \
+  mkdir -p /home/project && \
+  chown -R theia:theia /home/theia && \
+  chown -R theia:theia /home/project;
 
 USER theia
 EXPOSE 3000
