@@ -1,0 +1,6 @@
+src/.cache
+src/.node-gyp
+src/.npm
+.yarnrc
+src/.electron
+src/theia-master
