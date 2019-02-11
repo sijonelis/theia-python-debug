@@ -16,13 +16,23 @@
     "@theia/monaco": "latest",
     "@theia/typescript": "latest",
     "@theia/messages": "latest",
+    "@theia/debug": "^0.3.19",
+    "@theia/debug-nodejs": "^0.3.19",
+    "@theia/java": "^0.3.19",
+    "@theia/java-debug": "^0.3.19",
+    "@theia/python": "^0.3.19",
+    "@theia/editor": "^0.3.19",
+    "@theia/editor-preview": "^0.3.19",
+    "@theia/editorconfig": "^0.3.19",
+    "@theia/extension-manager": "^0.3.19",
+    "@theia/file-search": "^0.3.19",
     "hello-world": "0.0.0"
   },
   "devDependencies": {
     "@theia/cli": "latest"
   },
   "scripts": {
-    "prepare": "theia build --mode development",    
+    "prepare": "theia build --mode development",  
     "start": "theia start",
     "watch": "theia build --watch --mode development"
   },
