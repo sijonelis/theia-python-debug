@@ -27,7 +27,7 @@ export class HelloWorldMenuContribution implements MenuContribution {
     registerMenus(menus: MenuModelRegistry): void {
         menus.registerMenuAction(CommonMenus.EDIT_FIND, {
             commandId: HelloWorldCommand.id,
-            label: 'Say Hello'
+            label: 'Say Hello!!'
         });
     }
 }
