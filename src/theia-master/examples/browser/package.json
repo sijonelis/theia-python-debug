@@ -53,7 +53,7 @@
     "@theia/userstorage": "^0.3.19",
     "@theia/variable-resolver": "^0.3.19",
     "@theia/workspace": "^0.3.19",
-    "hello-world": "0.0.0"
+    "python-debug": "0.0.0"
   },
   "scripts": {
     "prepare": "yarn run clean && yarn build",

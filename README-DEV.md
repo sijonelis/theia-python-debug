@@ -8,4 +8,10 @@ To launch the development app:
 2. run `npx run watch` on desired package, i.e. `theia-master$ npx run watch hello-world` or `theia-master$ npx run watch @theia/python`
 3. run `yarn` in `~/theia-master/examples/browser` then `yarn theia start --hostname=0.0.0.0 --startup-timeout 100000` to start the now updated app.
 
-to be updated when more efficient means are found
+to be updated when more efficient means are found.
+
+
+
+References: 
+https://github.com/Microsoft/vscode-recipes/tree/master/debugging%20python
+https://github.com/Microsoft/vscode-python
