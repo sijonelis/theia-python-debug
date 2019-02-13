@@ -1,29 +1,50 @@
 {
   "name": "hello-world",
-  "keywords": [
-    "theia-extension"
-  ],
   "version": "0.0.0",
-  "files": [
-    "lib",
-    "src"
-  ],
+  "description": "Theia - Python Debug Extension",
   "dependencies": {
-    "@theia/core": "^0.3.19"
+    "@theia/core": "^0.3.19",
+    "@theia/debug": "^0.3.19",
+    "@theia/python": "^0.3.19"
   },
-  "devDependencies": {
-    "rimraf": "latest",
-    "typescript": "latest"
-  },
-  "scripts": {
-    "prepare": "yarn run clean && yarn run build",
-    "clean": "rimraf lib",
-    "build": "tsc",
-    "watch": "tsc -w"
+  "publishConfig": {
+    "access": "public"
   },
   "theiaExtensions": [
     {
       "frontend": "lib/browser/hello-world-frontend-module"
     }
-  ]
+  ],
+  "keywords": [
+    "theia-extension",
+    "debug",
+    "python"
+  ],
+  "license": "EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vilkazz/theia-java-dockerfile.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vilkazz/theia-java-dockerfile/issues"
+  },
+  "homepage": "https://github.com/vilkazz/theia-java-dockerfile",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "scripts": {
+    "postinstall": "download-debug-adapters",
+    "prepare": "yarn run clean && yarn run build",
+    "clean": "rimraf lib",
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "devDependencies": {
+    "rimraf": "latest",
+    "typescript": "latest"
+  },
+  "adapters": {
+    "python-debug": "https://ms-vscode.gallery.vsassets.io/_apis/public/gallery/publisher/ms-python/extension/python/2019.1.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage"
+  }
 }
