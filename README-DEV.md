@@ -18,6 +18,7 @@ References:
 theia development guide: https://github.com/theia-ide/theia/blob/master/doc/Developing.md
 
 VS python debugging: https://github.com/Microsoft/vscode-recipes/tree/master/debugging%20python
+VS Python debugger commands: https://github.com/Microsoft/vscode-python/blob/master/package.json
 language server guide: https://code.visualstudio.com/api/language-extensions/language-server-extension-guide
 currently implemented language server (no debug): https://github.com/palantir/python-language-server
 visual studio LS (with debug func): https://github.com/Microsoft/vscode-python
