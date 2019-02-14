@@ -94,13 +94,10 @@ export class PythonDebugAdapterContribution extends PythonDebugExtensionContribu
         const items = await this.resolveMainClass(workspaceFolderUri);
         const defaultLaunchConfig = {
             type: 'python',
-            name: 'Debug (Launch)',
+            name: 'Python: Terminal (integrated)',
             request: 'launch',
-            cwd: '${workspaceFolder}',
-            console: 'internalConsole',
-            stopOnEntry: false,
-            mainClass: '',
-            args: '',
+            program: "${file}",
+            console: 'integratedTerminal'
         };
         const cache = {};
         const launchConfigs = items.map(item => ({
@@ -109,14 +106,7 @@ export class PythonDebugAdapterContribution extends PythonDebugExtensionContribu
             mainClass: item.mainClass,
             projectName: item.projectName,
         }));
-        const defaultAttachConfig = {
-            type: 'python',
-            name: 'Debug (Attach)',
-            request: 'attach',
-            hostName: 'localhost',
-            port: '<debug port of remote debuggee>',
-        };
-        return [defaultLaunchConfig, ...launchConfigs, defaultAttachConfig];
+        return [defaultLaunchConfig, ...launchConfigs];
     }
     protected constructLaunchConfigName(mainClass: string, projectName: string | undefined, cache: {
         [name: string]: number
