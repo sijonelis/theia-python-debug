@@ -33,11 +33,8 @@ import { QuickPickService, QuickPickItem } from '@theia/core/lib/common/quick-pi
 import { AbstractVSCodeDebugAdapterContribution } from '@theia/debug/lib/node/vscode/vscode-debug-adapter-contribution';
 
 export namespace VSCodePythonDebugCommands {
-    export const COMPILE_WORKSPACE = 'java.workspace.compile';
-    export const RESOLVE_MAINCLASS = 'vscode.java.resolveMainClass';
-    export const VALIDATE_LAUNCH_CONFIG = 'vscode.java.validateLaunchConfig';
-    export const RESOLVE_CLASSPATH = 'vscode.java.resolveClasspath';
-    export const START_DEBUG_SESSION = 'vscode.java.startDebugSession';
+    export const VALIDATE_LAUNCH_CONFIG = 'vscode.python.validateLaunchConfig';
+    export const START_DEBUG_SESSION = 'vscode.debug.startDebugging';
 }
 
 export interface MainClassOption {
@@ -66,16 +63,6 @@ export class PythonDebugExtensionContribution extends AbstractVSCodeDebugAdapter
             path.join(__dirname, '../../download/python-debug/extension')
         );
     }
-
-    // async getExtensionBundles(): Promise<string[]> {
-    //     const debuggerContribution: {
-    //         contributes: { pythonExtensions: string[] }
-    //         // tslint:disable-next-line:no-any
-    //     } = <any>(await this.pck);
-    //     return debuggerContribution.contributes.pythonExtensions.map(pythonExtPath =>
-    //         path.resolve(this.extensionPath, pythonExtPath)
-    //     );
-    // }
 }
 
 @injectable()
@@ -91,22 +78,27 @@ export class PythonDebugAdapterContribution extends PythonDebugExtensionContribu
     protected readonly quickPickService: QuickPickService;
 
     async provideDebugConfigurations(workspaceFolderUri?: string): Promise<DebugConfiguration[]> {
-        const items = await this.resolveMainClass(workspaceFolderUri);
         const defaultLaunchConfig = {
             type: 'python',
             name: 'Python: Terminal (integrated)',
             request: 'launch',
-            program: "${file}",
+            program: '${file}',
             console: 'integratedTerminal'
         };
-        const cache = {};
-        const launchConfigs = items.map(item => ({
-            ...defaultLaunchConfig,
-            name: this.constructLaunchConfigName(item.mainClass, item.projectName, cache),
-            mainClass: item.mainClass,
-            projectName: item.projectName,
-        }));
-        return [defaultLaunchConfig, ...launchConfigs];
+        const defaultAttachConfig = {
+            type: 'python',
+            name: 'Attach (Remote Debug)',
+            request: 'attach',
+            host: 'localhost',
+            port: '5678',
+            'pathMappings': [
+                {
+                    'localRoot': '',
+                    'remoteRoot': '.'
+                }
+            ]
+        };
+        return [defaultLaunchConfig, defaultAttachConfig];
     }
     protected constructLaunchConfigName(mainClass: string, projectName: string | undefined, cache: {
         [name: string]: number
@@ -127,15 +119,6 @@ export class PythonDebugAdapterContribution extends PythonDebugExtensionContribu
     async resolveDebugConfiguration(config: DebugConfiguration, workspaceFolderUri?: string): Promise<DebugConfiguration | undefined> {
         try {
             if (config.request === 'launch') {
-                try {
-                    await this.compileWorkspace();
-                } catch (err) {
-                    const answer = await this.messages.error('Build failed, do you want to continue?', 'Proceed', 'Abort');
-                    if (answer !== 'Proceed') {
-                        return undefined;
-                    }
-                }
-
                 const mainClassOption = await this.resolveLaunchConfig(config, workspaceFolderUri);
                 if (!mainClassOption || !mainClassOption.mainClass) { // Exit silently if the user cancels the prompt fix by ESC.
                     // Exit the debug session.
@@ -145,14 +128,6 @@ export class PythonDebugAdapterContribution extends PythonDebugExtensionContribu
                 config.mainClass = mainClassOption.mainClass;
                 config.projectName = mainClassOption.projectName;
 
-                if (_.isEmpty(config.classPaths) && _.isEmpty(config.modulePaths)) {
-                    const result = await this.resolveClasspath(config.mainClass, config.projectName);
-                    config.modulePaths = result && result[0];
-                    config.classPaths = result && result[1];
-                }
-                if (_.isEmpty(config.classPaths) && _.isEmpty(config.modulePaths)) {
-                    throw new Error('Cannot resolve the modulepaths/classpaths automatically, please specify the value in the launch.json.');
-                }
             } else if (config.request === 'attach') {
                 if (!config.hostName || !config.port) {
                     throw new Error('Please specify the host name and the port of the remote debuggee in the launch.json.');
@@ -184,28 +159,10 @@ export class PythonDebugAdapterContribution extends PythonDebugExtensionContribu
     }
 
     protected async resolveLaunchConfig(config: DebugConfiguration, workspaceFolderUri?: string): Promise<MainClassOption | undefined> {
-        if (!config.mainClass) {
-            return this.promptMainClass(workspaceFolderUri);
-        }
-
-        const containsExternalClasspaths = !_.isEmpty(config.classPaths) || !_.isEmpty(config.modulePaths);
-        const validationResponse = await this.validateLaunchConfig(config.mainClass, config.projectName, containsExternalClasspaths, workspaceFolderUri);
-        if (validationResponse && (!validationResponse.mainClass.isValid || !validationResponse.projectName.isValid)) {
-            return this.fixMainClass(config, validationResponse, workspaceFolderUri);
-        }
-
         return {
             mainClass: config.mainClass,
             projectName: config.projectName,
         };
-    }
-
-    protected async promptMainClass(workspaceFolderUri?: string): Promise<MainClassOption | undefined> {
-        const options = await this.resolveMainClass(workspaceFolderUri);
-        if (options.length) {
-            return this.selectMainClass(options);
-        }
-        throw new Error('Cannot find a class with the main method.');
     }
 
     protected async fixMainClass(config: DebugConfiguration, validationResponse: LaunchValidationResponse, workspaceFolderUri?: string): Promise<MainClassOption | undefined> {
@@ -243,27 +200,6 @@ export class PythonDebugAdapterContribution extends PythonDebugExtensionContribu
                 value: option
             };
         });
-    }
-
-    protected async resolveMainClass(workspaceFolderUri?: string): Promise<MainClassOption[]> {
-        const items = await this.commands.executeCommand<MainClassOption[]>(VSCodePythonDebugCommands.RESOLVE_MAINCLASS, workspaceFolderUri);
-        return items || [];
-    }
-
-    protected compileWorkspace(): Promise<void> {
-        return this.commands.executeCommand<void>(VSCodePythonDebugCommands.COMPILE_WORKSPACE, false);
-    }
-
-    protected validateLaunchConfig(
-        mainClass: string, projectName: string, containsExternalClasspaths: boolean, workspaceFolderUri?: string
-    ): Promise<LaunchValidationResponse | undefined> {
-        return this.commands.executeCommand<LaunchValidationResponse>(
-            VSCodePythonDebugCommands.VALIDATE_LAUNCH_CONFIG, workspaceFolderUri, mainClass, projectName, containsExternalClasspaths
-        );
-    }
-
-    protected resolveClasspath(mainClass: string | undefined, projectName: string | undefined): Promise<[string, string] | undefined> {
-        return this.commands.executeCommand<[string, string]>(VSCodePythonDebugCommands.RESOLVE_CLASSPATH, mainClass, projectName);
     }
 
     protected startDebugSession(): Promise<any> {
