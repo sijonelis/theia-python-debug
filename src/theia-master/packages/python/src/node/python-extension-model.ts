@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (C) 2017 TypeFox and others.
+ * Copyright (C) 2019 Red Hat, Inc. and others.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -14,15 +14,20 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { ContainerModule } from 'inversify';
-import { bindContributionProvider } from '@theia/core/lib/common';
-import { LanguageServerContribution } from '@theia/languages/lib/node';
-import { PythonContribution } from './python-contribution';
-import { PythonExtensionContribution } from './python-extension-model';
+import { MaybePromise } from '@theia/core/lib/common/types';
 
-export default new ContainerModule(bind => {
-    bind(PythonContribution).toSelf().inSingletonScope();
-    bind(LanguageServerContribution).toService(PythonContribution);
+/**
+ * PythonExtensionContribution symbol for DI.
+ */
+export const PythonExtensionContribution = Symbol('PythonExtensionContribution');
 
-    bindContributionProvider(bind, PythonExtensionContribution);
-});
+/**
+ * A contribution point for extensions to jdt.ls.
+ */
+export interface PythonExtensionContribution {
+    /**
+     * Returns an array of paths to the python files.
+     * The paths should be absolute.
+     */
+    getExtensionBundles(): MaybePromise<string[]>;
+}

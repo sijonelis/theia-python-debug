@@ -13,7 +13,8 @@
   },
   "theiaExtensions": [
     {
-      "frontend": "lib/browser/python-debug-frontend-module"
+      "frontend": "lib/browser/python-debug-frontend-module",
+      "backend": "lib/node/python-debug-backend-module"
     }
   ],
   "keywords": [

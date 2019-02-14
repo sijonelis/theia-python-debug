@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (C) 2017 TypeFox and others.
+ * Copyright (C) 2018 TypeFox and others.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -15,14 +15,13 @@
  ********************************************************************************/
 
 import { ContainerModule } from 'inversify';
-import { bindContributionProvider } from '@theia/core/lib/common';
-import { LanguageServerContribution } from '@theia/languages/lib/node';
-import { PythonContribution } from './python-contribution';
-import { PythonExtensionContribution } from './python-extension-model';
+import { PythonDebugAdapterContribution } from './python-debug-adapter-contribution';
+import { DebugAdapterContribution } from '@theia/debug/lib/common/debug-model';
 
 export default new ContainerModule(bind => {
-    bind(PythonContribution).toSelf().inSingletonScope();
-    bind(LanguageServerContribution).toService(PythonContribution);
-
-    bindContributionProvider(bind, PythonExtensionContribution);
+    /* explicit inTransientScope because it is very important, that
+       each web socket connection gets its own instance,
+       since it is using frontend services via this connection */
+    bind(DebugAdapterContribution).to(PythonDebugAdapterContribution).inTransientScope();
+    // bind(PythonExtensionContribution).to(PythonDebugExtensionContribution).inSingletonScope();
 });
