@@ -47,9 +47,6 @@ export class PythonDebugFrontendContribution implements FrontendApplicationContr
     @inject(CommandRegistry)
     protected readonly commands: CommandRegistry;
 
-    // @inject(MessageService)
-    // private readonly messageService: MessageService;
-
     @inject(MessageService)
     protected readonly messages: MessageService;
 
@@ -101,21 +98,17 @@ export class PythonDebugFrontendContribution implements FrontendApplicationContr
 
     registerCommands(commands: CommandRegistry): void {
         commands.registerCommand(PythonDebugCommands.RUN, {
-            execute: (mainClass, projectName, uri) => this.runProgram(mainClass, projectName, uri)
+            execute: (uri) => this.runProgram(uri)
         });
         commands.registerCommand(PythonDebugCommands.DEBUG, {
-            execute: (mainClass, projectName, uri) => this.runProgram(mainClass, projectName, uri, false)
-        });
-        commands.registerCommand(PythonDebugCommand, {
-            execute: () => this.messages.info('Hello World!')
+            execute: (uri) => this.runProgram(uri, false)
         });
     }
 
-    protected async runProgram(mainClass: string, projectName: string, uri: string, noDebug: boolean = true): Promise<void> {
+    protected async runProgram(uri: string, noDebug: boolean = true): Promise<void> {
         const workspaceFolder = this.workspaceService.getWorkspaceRootUri(new URI(uri));
         const workspaceFolderUri = workspaceFolder && workspaceFolder.toString();
-        const configuration = this.constructDebugConfig(mainClass, projectName, workspaceFolderUri);
-        configuration.projectName = projectName;
+        const configuration = this.constructDebugConfig(workspaceFolderUri);
         configuration.noDebug = noDebug;
         await this.sessions.start({
             configuration,
@@ -124,34 +117,37 @@ export class PythonDebugFrontendContribution implements FrontendApplicationContr
     }
 
     // todo fix codelens implementation
-    protected constructDebugConfig(mainClass: string, projectName: string, workspaceFolderUri?: string): DebugConfiguration {
-        return _.cloneDeep(this.findConfiguration(mainClass, projectName).next().value || {
+    protected constructDebugConfig(workspaceFolderUri?: string): DebugConfiguration {
+        return ({
             type: 'python',
-            name: `CodeLens (Launch) - ${mainClass.substr(mainClass.lastIndexOf('.') + 1)}`,
+            name: 'Python: Terminal (integrated)',
             request: 'launch',
-            cwd: workspaceFolderUri ? '${workspaceFolder}' : undefined,
-            console: 'internalConsole',
-            stopOnEntry: false,
-            mainClass,
-            args: '',
-            projectName,
+            program: '${file}',
+            console: 'integratedTerminal'
         });
+        // return _.cloneDeep(this.findConfiguration().next().value || {
+        //     type: 'python',
+        //     name: 'Python: Terminal (integrated)',
+        //     request: 'launch',
+        //     program: '${file}',
+        //     console: 'integratedTerminal'
+        // });
     }
 
-    protected * findConfiguration(mainClass: string, projectName: string): IterableIterator<DebugConfiguration> {
-        for (const option of this.configurations.all) {
-            const { configuration } = option;
-            if (configuration.mainClass === mainClass && _.toString(configuration.projectName) === _.toString(projectName)) {
-                yield configuration;
-            }
-        }
-        for (const option of this.configurations.all) {
-            const { configuration } = option;
-            if (configuration.mainClass === mainClass && !configuration.projectName) {
-                yield configuration;
-            }
-        }
-    }
+    // protected * findConfiguration(mainClass: string, projectName: string): IterableIterator<DebugConfiguration> {
+    //     for (const option of this.configurations.all) {
+    //         const { configuration } = option;
+    //         if (configuration.mainClass === mainClass && _.toString(configuration.projectName) === _.toString(projectName)) {
+    //             yield configuration;
+    //         }
+    //     }
+    //     for (const option of this.configurations.all) {
+    //         const { configuration } = option;
+    //         if (configuration.mainClass === mainClass && !configuration.projectName) {
+    //             yield configuration;
+    //         }
+    //     }
+    // }
 
     protected dirtyDebugSettings = true;
     protected async updateDebugSettings(): Promise<void> {
@@ -175,7 +171,7 @@ export class PythonDebugFrontendContribution implements FrontendApplicationContr
         // convert common log level to python log level
         switch (commonLogLevel.toLowerCase()) {
             case 'verbose':
-                return 'Trace';
+                return 'Warning';
             case 'warn':
                 return 'Warning';
             case 'error':
@@ -183,7 +179,7 @@ export class PythonDebugFrontendContribution implements FrontendApplicationContr
             case 'info':
                 return 'Information';
             default:
-                return 'Trace';
+                return 'Warning';
         }
     }
 
@@ -198,13 +194,3 @@ export class PythonDebugFrontendContribution implements FrontendApplicationContr
     }
 }
 
-
-@injectable()
-export class PythonDebugMenuContribution implements MenuContribution {
-    registerMenus(menus: MenuModelRegistry): void {
-        menus.registerMenuAction(CommonMenus.EDIT_FIND, {
-            commandId: PythonDebugCommand.id,
-            label: 'Say Hello!!'
-        });
-    }
-}

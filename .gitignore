@@ -5,3 +5,4 @@ src/.npm
 src/.electron
 src/.theia
 .idea
+.python_history
