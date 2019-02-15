@@ -4,5 +4,7 @@ src/.npm
 .yarnrc
 src/.electron
 src/.theia
+src/.config
+src/.tooling
 .idea
 .python_history
