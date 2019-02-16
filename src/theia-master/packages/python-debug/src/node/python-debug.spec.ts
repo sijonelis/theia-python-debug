@@ -15,6 +15,5 @@
  ********************************************************************************/
 
 describe('python-debug package', () => {
-
     it('support code coverage statistics', () => true);
 });

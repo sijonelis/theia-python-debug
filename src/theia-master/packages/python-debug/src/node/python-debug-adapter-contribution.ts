@@ -25,7 +25,6 @@ import * as path from 'path';
 import * as _ from 'lodash';
 import { injectable, inject } from 'inversify';
 import { DebugConfiguration } from '@theia/debug/lib/common/debug-configuration';
-// import { PythonExtensionContribution } from '@theia/python/lib/node';
 // tslint:disable-next-line:no-implicit-dependencies
 import { MessageService, CommandService } from '@theia/core/lib/common';
 // tslint:disable-next-line:no-implicit-dependencies

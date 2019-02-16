@@ -1,12 +1,11 @@
 {
   "name": "python-debug",
-  "version": "0.0.0",
-  "description": "Theia - Python Debug Extension",
+  "version": "1.0.0",
+  "description": "Theia - Python Debug Extension. This module implements debug interface from vs-python VS Studio extension.",
   "dependencies": {
     "@theia/core": "^0.3.19",
     "@theia/debug": "^0.3.19",
-    "@theia/python": "^0.3.19",
-    "lodash": "^4.17.10"
+    "@theia/python": "^0.3.19"
   },
   "publishConfig": {
     "access": "public"

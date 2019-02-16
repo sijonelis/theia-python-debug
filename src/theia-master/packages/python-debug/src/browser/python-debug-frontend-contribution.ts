@@ -1,9 +1,8 @@
-import * as _ from 'lodash';
 import { injectable, inject } from "inversify";
 // tslint:disable:no-implicit-dependencies
 import URI from '@theia/core/lib/common/uri';
-import { CommandContribution, CommandRegistry, Command, MenuContribution, MenuModelRegistry, MessageService } from "@theia/core/lib/common";
-import { FrontendApplicationContribution, CommonMenus } from "@theia/core/lib/browser";
+import { CommandContribution, CommandRegistry, Command, MessageService } from "@theia/core/lib/common";
+import { FrontendApplicationContribution } from "@theia/core/lib/browser";
 import { Workspace, Languages } from '@theia/languages/lib/browser';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 // tslint:enable:no-implicit-dependencies
@@ -116,7 +115,6 @@ export class PythonDebugFrontendContribution implements FrontendApplicationContr
         });
     }
 
-    // todo fix codelens implementation
     protected constructDebugConfig(workspaceFolderUri?: string): DebugConfiguration {
         return ({
             type: 'python',
@@ -125,29 +123,7 @@ export class PythonDebugFrontendContribution implements FrontendApplicationContr
             program: '${file}',
             console: 'integratedTerminal'
         });
-        // return _.cloneDeep(this.findConfiguration().next().value || {
-        //     type: 'python',
-        //     name: 'Python: Terminal (integrated)',
-        //     request: 'launch',
-        //     program: '${file}',
-        //     console: 'integratedTerminal'
-        // });
     }
-
-    // protected * findConfiguration(mainClass: string, projectName: string): IterableIterator<DebugConfiguration> {
-    //     for (const option of this.configurations.all) {
-    //         const { configuration } = option;
-    //         if (configuration.mainClass === mainClass && _.toString(configuration.projectName) === _.toString(projectName)) {
-    //             yield configuration;
-    //         }
-    //     }
-    //     for (const option of this.configurations.all) {
-    //         const { configuration } = option;
-    //         if (configuration.mainClass === mainClass && !configuration.projectName) {
-    //             yield configuration;
-    //         }
-    //     }
-    // }
 
     protected dirtyDebugSettings = true;
     protected async updateDebugSettings(): Promise<void> {
@@ -193,4 +169,3 @@ export class PythonDebugFrontendContribution implements FrontendApplicationContr
         }
     }
 }
-
