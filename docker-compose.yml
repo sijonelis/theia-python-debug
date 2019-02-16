@@ -6,7 +6,7 @@ services:
     build: 
       context:
         ./docker
-      dockerfile: dockerfile-dev
+      dockerfile: dockerfile
     ports: 
       - 3000:3000
     volumes:
