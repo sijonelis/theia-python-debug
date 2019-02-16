@@ -9,5 +9,10 @@ services:
       dockerfile: dockerfile
     ports: 
       - 3000:3000
+    # dev volume
+    # volumes:
+      # - ./src:/home/theia
+    
+    #prod volume
     volumes:
-      - ./src:/home/theia
+      - ./workspace:/home/project
