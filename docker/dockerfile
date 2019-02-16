@@ -15,7 +15,10 @@ RUN adduser --disabled-password --gecos '' theia && \
 RUN apt-get update && apt-get install -y python build-essential
 
 RUN chmod g+rw /home && \
+  # Workspace folder
   mkdir -p /home/project && \
+  # System folder
+  mkdir -p /home/theia && \
   chown -R theia:theia /home/theia && \
   chown -R theia:theia /home/project;
 
@@ -30,10 +33,6 @@ FROM node:8-stretch
 WORKDIR /home/theia
 
 COPY --from=builder /home/theia .
-
-# Install Java language server
-RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
-RUN apt-get update && apt-get -y install openjdk-8-jdk 
 
 # Install python language server
 RUN apt-get update \
