@@ -3,6 +3,9 @@
 * To launch simply clone the rep and run docker-compose up  
 * To launch in-docker development (dockerfile-dev) configuraton, please refer to README-DEV.md for more info.
 
+*Debug configuration notes:
+- To preserve debug logs, "console" parameter should be either "none" or removed altogether from the launch configuration. If present it will cause theia to spawn a separate debug console for each debug session which will then be destroyed upon session termination.
+
 Python debuger launch.json configuration attributes: 
 ```json
 {
@@ -204,40 +207,5 @@ Python debuger launch.json configuration attributes:
         }
     }
   }
-}
-```
-
-To use java debugger (also implemented in the example) use:
-
-```java 
-package asd;
-
-class Test {
-    public static void main(String[] args) {
-        System.out.println("this");
-        System.out.println("and this");
-    }
-}
-```
-
-is (configuration is added through top menu Debug->Add Configurations)
-
-```json
-{
-  // Use IntelliSense to learn about possible attributes.
-  // Hover to view descriptions of existing attributes.
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "type": "java",
-      "name": "Debug (Launch)-Test",
-      "request": "launch",
-      "cwd": "${workspaceFolder}",
-      "console": "internalConsole",
-      "stopOnEntry": false,
-      "mainClass": "asd.Test",
-      "args": ""
-    }
-  ]
 }
 ```
