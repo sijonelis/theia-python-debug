@@ -20,7 +20,7 @@ Usage is similar to other theia debug extensions. Detailed guide can be found at
 },
 ```
 
-Python-specific debug configuration attributes: 
+# Python-specific debug configuration attributes: 
 ```json
 {
   "configurationAttributes": {
