@@ -1,9 +1,24 @@
 # Theia python debug implementation (vscode-python extension)
 
-Usage is similar to other theia debug extensions. Detailde guide can be found at: https://github.com/theia-ide/theia
+Usage is similar to other theia debug extensions. Detailed guide can be found at: https://github.com/theia-ide/theia
+
+# Versions
+* "python-debug": "next" For theia next builds 
+* "python-debug": "1.0.0" for versions below 0.6.1
+* "python-debug": "1.0.2" for ^0.6.1
 
 # Known issues:
-* Python debugger creates a new terminal window for each debug session and later terminates the same window when terminating the session (either successfully or due to an error). To preserve the debug log after the debug session, Theia debug console needs to be kept "focused" by drag and dropping it to a different location from its default location as shown in the http://prntscr.com/mlrme3.
+* Python debugger creates a new terminal window for each debug session and later terminates the same window when terminating the session (either successfully or due to an error). To preserve the debug log after the debug session, console setting in the debug configuration has to be set to "none":
+
+```json
+ {
+      "type": "python",
+      "name": "Python: Terminal (integrated)",
+      "request": "launch",
+      "program": "${file}",
+      "console": "none"
+},
+```
 
 Python-specific debug configuration attributes: 
 ```json
