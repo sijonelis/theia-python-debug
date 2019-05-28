@@ -5,7 +5,7 @@ Usage is similar to other theia debug extensions. Detailed guide can be found at
 # Versions
 * "python-debug": "next" For theia next builds 
 * "python-debug": "1.0.0" for versions below 0.6.1
-* "python-debug": "1.0.2" for ^0.6.1
+* "python-debug": "1.0.6" for >=0.6.1
 
 # Known issues:
 * Python debugger creates a new terminal window for each debug session and later terminates the same window when terminating the session (either successfully or due to an error). To preserve the debug log after the debug session, console setting in the debug configuration has to be set to "none":
